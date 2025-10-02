@@ -10,7 +10,7 @@ use smallvec::SmallVec;
 #[relation(source = FriendOf, target = FriendOf)]
 pub struct Friendship;
 
-pub type Friend = Related<FriendOf>;
+pub type Friend = Related<(), FriendOf>;
 
 #[derive(Relatable)]
 #[relatable(SmallVec<[Entity; 8]> in Friendship, opposite = Self)]
@@ -31,8 +31,6 @@ fn add_remove() {
     assert_eq!(world.get::<Friend>(c), Some(&Friend::from_iter([a, b])));
 
     world.entity_mut(b).remove::<Friend>();
-
-    world.flush();
 
     assert_eq!(world.get::<Friend>(a), Some(&Friend::from_iter([c])));
     assert_eq!(world.get::<Friend>(b), None);

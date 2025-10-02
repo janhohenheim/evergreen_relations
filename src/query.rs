@@ -1,6 +1,6 @@
-use bevy_ecs::query::{QueryData, ReadOnlyQueryData};
-
 use crate::{prelude::Relation, related::Related};
+use bevy_ecs::query::{QueryData, ReadOnlyQueryData};
+use std::fmt::Debug;
 
 /// [`QueryData`] wrapper for fetching the sides of a [`Relation`].
 ///
@@ -8,20 +8,27 @@ use crate::{prelude::Relation, related::Related};
 /// `Source` and `Target` sides of the relation are required, optional, or not
 /// fetched at all, respectively.
 #[derive(QueryData)]
-pub struct SelectRelated<R: Relation, S: Selector, T: Selector> {
+pub struct SelectRelated<
+    T: Clone + PartialEq + Eq + Debug + Send + Sync + 'static,
+    R: Relation<T>,
+    S: Selector,
+    A: Selector,
+> {
     /// The source side of the relation.
-    pub source: S::Item<&'static Related<R::Source>>,
+    pub source: S::Item<&'static Related<T, R::Source>>,
     /// The target side of the relation.
-    pub target: T::Item<&'static Related<R::Target>>,
+    pub target: A::Item<&'static Related<T, R::Target>>,
 }
 
 /// A [`SelectRelated`] variant that fetches both sides of the relation as-is,
 /// requiring both to be present.
-pub type BothRelated<R> = SelectRelated<R, Required, Required>;
+pub type BothRelated<T: Clone + PartialEq + Eq + Debug + Send + Sync + 'static, R> =
+    SelectRelated<T, R, Required, Required>;
 
 /// A [`SelectRelated`] variant that fetches both sides of the relation as
 /// [`Option`]s, allowing either or both to be absent.
-pub type EitherRelated<R> = SelectRelated<R, Optional, Optional>;
+pub type EitherRelated<T: Clone + PartialEq + Eq + Debug + Send + Sync + 'static, R> =
+    SelectRelated<T, R, Optional, Optional>;
 
 /// A trait providing a type function that determines the type of the item
 /// fetched by a [`SelectRelated`] query.

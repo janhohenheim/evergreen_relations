@@ -9,4 +9,5 @@ edition = "2024"
 [dependencies]
 evergreen_relations_macros = { path = "macros" }
 bevy_ecs = { version = "0.17", default-features = false }
+bevy_platform = { version = "0.17", default-features = false }
 smallvec = { version = "1.13", features = ["const_generics"] }
